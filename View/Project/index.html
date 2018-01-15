@@ -1,0 +1,32 @@
+<div class="tool-box">
+    <a class="btn btn-primary btn-large" data-toggle="dialog" data-target="/project/edit">创建项目</a>
+</div>
+<table data-delete-url="/project/delete?model=project">
+    <thead>
+    <tr>
+        <th width="200">项目名称</th>
+        <th width="200">项目编码</th>
+        <th width="200">当前版本</th>
+        <th width="200">操作</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    {{foreach item=project from=$projects}}
+    <tr data-id="{{$project.id}}">
+        <td>{{$project.name}}</td>
+        <td>{{$project.code}}</td>
+        <td>{{$project.version|default:'-'}}</td>
+        <td>
+            <div class="btn-group">
+                <a class="btn" href="/version/index?projId={{$project.id}}">版 本</a>
+                <a class="btn" href="/server/index?projId={{$project.id}}">服务器</a>
+                <a class="btn" data-toggle="dialog" data-target="/project/edit?id={{$project.id}}" data-title="修改信息">编 辑</a>
+                <a class="btn btn-delete">删 除</a>
+            </div>
+        </td>
+        <td></td>
+    </tr>
+    {{/foreach}}
+    </tbody>
+</table>

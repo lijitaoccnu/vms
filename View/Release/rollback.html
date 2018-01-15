@@ -1,0 +1,81 @@
+<div style="width: 600px;">
+    <div class="panel">
+        <div class="panel-head">版本信息</div>
+        <div class="panel-body">
+            <p>【项目】{{$project.name}}</p>
+            <p>【当前版本】{{$project.version}}</p>
+            <p>【回滚版本】{{$version.version}}</p>
+        </div>
+    </div>
+    <div id="rollback-view" class="panel hide" style="margin-top: 20px;">
+        <div class="panel-head">回滚结果</div>
+        <div class="panel-body">
+            <div id="rollback-detail"></div>
+        </div>
+    </div>
+    <div style="text-align: right;">
+        <div id="rollback-notice" class="fl" style="line-height: 38px; color: orange;">请确认回滚版本</div>
+        <a id="btn-rollback" class="btn btn-large btn-primary" style="width: 100px;">开始回滚</a>
+        <a id="btn-complete" href="/version/index?projId={{$project.id}}" class="btn btn-large btn-primary hide" style="width: 100px;">完 成</a>
+    </div>
+</div>
+<script>
+    (function () {
+        var rolled = 0;
+        var servers = null;
+        var projId = '{{$project.id}}';
+        var versionId = '{{$version.id}}';
+
+        $('#btn-rollback').click(function () {
+            ajaxRequest('/server/lists', {projId: projId}, function (data) {
+                servers = data;
+                $('#btn-rollback').addClass('hide');
+                $('#rollback-view').removeClass('hide');
+                rollback();
+            });
+        });
+
+        function rollback() {
+            var div;
+            var $container = $('#rollback-detail');
+            showNotice('正在进行版本回滚');
+            rolled = 0;
+            for (var i = 0; i < servers.length; i++) {
+                div = '<div id="rollback-server-' + servers[i]['id'] + '" style="padding: 5px 0;">';
+                div += '<span>' + servers[i]['host'] + '</span>';
+                div += '<span class="process" style="margin: 0 10px;"></span>';
+                div += '</div>';
+                $container.append(div);
+                rollbackToServer(servers[i]['id']);
+            }
+        }
+
+        function rollbackToServer(serverId) {
+            var $server = $('#rollback-server-' + serverId);
+            $server.find('.process').text('回滚中').css({color: 'skyblue'});
+            $server.find('.retry').remove();
+            var params = {versionId: versionId, serverId: serverId};
+            ajaxRequest('/release/rollbackToServer', params, function () {
+                rolled++;
+                $server.find('.process').text('SUCCESS').css({color: 'green'});
+                if (rolled === servers.length) {
+                    showNotice('版本回滚完毕');
+                    ajaxRequest('/release/rollbackOver', {versionId: versionId}, function () {
+                        $('#btn-complete').removeClass('hide');
+                    });
+                }
+            }, function (code, message) {
+                showNotice('版本回滚发生错误');
+                $server.find('.process').text(message).css({color: 'red'});
+                var $btn = $('<a href="javascript:;" class="retry">Retry</a>');
+                $btn.appendTo($server).click(function () {
+                    rollbackToServer(serverId);
+                });
+            });
+        }
+
+        function showNotice(text) {
+            $('#rollback-notice').text(text);
+        }
+    })();
+</script>

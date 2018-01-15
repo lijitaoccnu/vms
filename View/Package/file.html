@@ -1,0 +1,10 @@
+<div style="width: 800px;">
+    <textarea id="fileContent" style="width: 100%; max-height: 700px; line-height: 20px; font-size: 12px;" readonly>{{$content}}</textarea>
+</div>
+<script>
+    (function () {
+        require(JS_URL + '/textarea-autosize.js', function () {
+            textareaAutosize(document.getElementById('fileContent'));
+        });
+    })();
+</script>

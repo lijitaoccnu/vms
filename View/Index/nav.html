@@ -1,0 +1,24 @@
+<div class="nav-header">
+    <h2>版本发布系统</h2>
+</div>
+<div class="nav-body">
+    <ul class="nav-menu-1">
+        {{foreach key=key1 item=menu1 from=$menu}}
+        <li data-uri="{{$menu1.uri}}">
+            <div>
+                <span style="font-size: 26px; margin-right: 10px;">◎</span><span>{{$menu1.name}}</span>
+                {{if $menu1.children}}
+                <span class="triangle">∨</span>
+                {{/if}}
+            </div>
+            {{if $menu1.children}}
+            <ul class="nav-menu-2">
+                {{foreach key=key2 item=menu2 from=$menu1.children}}
+                <li data-uri="{{$menu2.uri}}"><span>◆</span>{{$menu2.name}}</li>
+                {{/foreach}}
+            </ul>
+            {{/if}}
+        </li>
+        {{/foreach}}
+    </ul>
+</div>

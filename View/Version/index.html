@@ -1,0 +1,69 @@
+<div class="tool-box">
+    <a class="btn btn-primary btn-large" data-toggle="dialog" data-target="/version/edit?projId={{$REQUEST.projId}}">构建版本</a>
+    <div class="search-box" style="padding: 5px 0;">
+        <form method="get">
+            <select name="projId" data-value="{{$REQUEST.projId}}" style="width: auto;">
+                <option value="" disabled selected class="hide">--项目--</option>
+                {{foreach item=p from=$projects}}
+                <option value="{{$p.id}}">{{$p.name}}</option>
+                {{/foreach}}
+            </select>
+            <a class="btn btn-primary" type="submit">搜 索</a>
+            <a class="btn btn-clear">清 空</a>
+        </form>
+    </div>
+</div>
+<div class="panel">
+    <div class="panel-head">版本列表{{if $project}} > {{$project.name}}{{/if}}</div>
+    <div class="panel-body">
+        {{if $list}}
+        <table data-delete-url="/version/delete">
+            <thead>
+            <tr>
+                <th width="80">版本号</th>
+                <th>版本标题</th>
+                <th>更新包</th>
+                <th width="150">创建时间</th>
+                <th width="150">创建人</th>
+                <th width="150">发布开始时间</th>
+                <th width="150">发布完成时间</th>
+                <th width="150">发布人</th>
+                <th width="200">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{foreach item=v from=$list}}
+            <tr data-id="{{$v.id}}">
+                <td>{{$v.version}}</td>
+                <td>{{$v.title}}</td>
+                <td>{{if $v.package}}<a class="btn btn-link" data-toggle="dialog" data-title="更新包预览" data-target="/package/view?uuid={{$v.package}}">{{$packages[$v.package].filename}}</a>{{else}}-{{/if}}</td>
+                <td>{{$v.createTime}}</td>
+                <td>{{$v.createBy|default:'-'}}</td>
+                <td>{{$v.publishStartTime|default:'-'}}</td>
+                <td>{{$v.publishOverTime|default:'-'}}</td>
+                <td>{{$v.publishBy|default:'-'}}</td>
+                <td>
+                    <div class="btn-group">
+                        {{if !$v.publishOverTime}}
+                        <a class="btn" data-toggle="dialog" data-title="版本发布" data-target="/release/release?versionId={{$v.id}}">发 布</a>
+                        {{elseif $v.version != $project.version}}
+                        <a class="btn" data-toggle="dialog" data-title="版本回滚" data-target="/release/rollback?versionId={{$v.id}}">回 滚</a>
+                        {{else}}
+                        <a class="btn btn-primary">运行中</a>
+                        {{/if}}
+                        <a class="btn" data-toggle="dialog" data-target="/version/edit?id={{$v.id}}" data-title="编辑版本">编 辑</a>
+                        <a class="btn btn-delete">删 除</a>
+                    </div>
+                </td>
+            </tr>
+            {{/foreach}}
+            </tbody>
+        </table>
+        {{$pager->display()}}
+        {{else}}
+        <div style="padding: 50px; text-align: center;">
+            <p>{{if $REQUEST.projId}}没有搜索到版本{{else}}选择项目进行搜索{{/if}}</p>
+        </div>
+        {{/if}}
+    </div>
+</div>

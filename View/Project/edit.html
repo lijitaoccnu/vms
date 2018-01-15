@@ -1,0 +1,22 @@
+<form action="/project/{{if !$project}}create{{else}}update?id={{$project.id}}{{/if}}" method="post">
+    <div class="form-control">
+        <label>项目名称</label>
+        <input name="name" maxlength="32" value="{{$project.name}}" required>
+    </div>
+    <div class="form-control">
+        <label>项目编码</label>
+        <input name="code" maxlength="32" value="{{$project.code}}" required>
+    </div>
+    <div class="form-control">
+        <label>部署目录</label>
+        <input name="rootPath" placeholder="代码文档部署根目录" value="{{$project.rootPath}}" style="width: 350px;" required>
+    </div>
+    <div class="form-control">
+        <label>缓存目录</label>
+        <input name="cachePath" placeholder="缓存文件目录" value="{{$project.cachePath}}" style="width: 350px;">
+    </div>
+    <div class="form-control">
+        <label>过滤路径</label>
+        <textarea name="ignorePath" placeholder="备份忽略路径，分号(;)间隔" rows="5" style="width: 350px;">{{$project.ignorePath}}</textarea>
+    </div>
+</form>

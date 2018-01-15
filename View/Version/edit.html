@@ -1,0 +1,29 @@
+<form action="/version/{{if !$version}}create{{else}}update?id={{$version.id}}{{/if}}" method="post">
+    <div class="form-control">
+        <label style="width: 70px;">项目</label>
+        <select name="projId" data-value="{{$version.projId|default:$REQUEST.projId}}" required>
+            <option value="" disabled selected class="hide">--请选择--</option>
+            {{foreach item=project from=$projects}}
+            <option value="{{$project.id}}">{{$project.name}}</option>
+            {{/foreach}}
+        </select>
+    </div>
+    <div class="form-control">
+        <label style="width: 70px;">版本号</label>
+        <input name="version" value="{{$version.version}}" style="width: 400px;"
+               data-format="/^\d+\.\d+\.\d+$/" required {{if $version.pushStartTime}}readonly{{/if}}>
+    </div>
+    <div class="form-control">
+        <label style="width: 70px;">版本标题</label>
+        <input name="title" value="{{$version.title}}" style="width: 400px;" required>
+    </div>
+    <div class="form-control">
+        <label style="width: 70px;">版本内容</label>
+        <textarea name="detail" rows="5" style="width: 400px;" required>{{$version.detail}}</textarea>
+    </div>
+    <div class="form-control">
+        <label style="width: 70px;">更新包</label>
+        <input name="package" class="uploader" style="width: 333px;"
+               data-options="uploadUrl:'/package/upload',{{if $package}}files:[{uuid:'{{$package.uuid}}',filename:'{{$package.filename}}'}],{{/if}}fileType:'zip',maxSize:{{$upload_max_filesize}}">
+    </div>
+</form>

@@ -1,0 +1,162 @@
+<div style="width: 600px;">
+    <div class="panel">
+        <div class="panel-head">版本信息</div>
+        <div class="panel-body">
+            <p>【项目】<span style="color: blue;">{{$project.name}}</span></p>
+            <p>【当前版本】<span style="color: blue;">{{$project.version|default:'无'}}</span></p>
+            <p>【发布版本】<span style="color: blue;">{{$version.version}}</span></p>
+        </div>
+    </div>
+    <div id="step-1" class="panel hide">
+        <div class="panel-head">推送更新</div>
+        <div class="panel-body">
+            <div id="push-detail"></div>
+        </div>
+    </div>
+    <div id="step-2" class="panel hide">
+        <div class="panel-head">发布更新</div>
+        <div class="panel-body">
+            <div id="publish-detail"></div>
+        </div>
+    </div>
+    <div style="text-align: right;">
+        <div id="release-notice" class="fl" style="line-height: 38px; color: orange;">发布版本分2步，第一步：推送更新包，第二步：发布版本</div>
+        <a id="btn-publish" class="btn btn-large btn-primary" style="width: 100px;">开始发布</a>
+        <a id="btn-complete" href="/version/index?projId={{$project.id}}" class="btn btn-large btn-primary hide" style="width: 100px;">完 成</a>
+    </div>
+</div>
+<script>
+    (function () {
+        var step = 0;
+        var projId = '{{$project.id}}';
+        var versionId = '{{$version.id}}';
+        var packageId = '{{$version.package}}';
+        var servers = null;
+        var pushed = 0;
+        var published = 0;
+        var pushOver = false;
+
+        $('#btn-next').click(function () {
+            eval('step' + (step + 1) + '()');
+        });
+
+        $('#btn-publish').click(function () {
+            step1();
+        });
+
+        function step1() {
+            if (!packageId) {
+                return alertError('版本信息不完整，缺少更新包');
+            }
+            $('#btn-publish').addClass('hide');
+            $('#step-1').removeClass('hide');
+            step = 1;
+            ajaxRequest('/server/lists', {projId: projId}, function (data) {
+                servers = data;
+                push();
+            });
+        }
+
+        function step2() {
+            if (!pushOver) {
+                return alertError('更新包推送未完成');
+            }
+            $('#step-2').removeClass('hide');
+            step = 2;
+            publish();
+        }
+
+        function push() {
+            var div;
+            var $container = $('#push-detail');
+            $('#btn-publish').addClass('hide');
+            pushed = 0;
+            for (var i = 0; i < servers.length; i++) {
+                div = '<div id="push-server-' + servers[i]['id'] + '" style="padding: 5px 0;">';
+                div += '<span>' + servers[i]['host'] + '</span>';
+                div += '<span class="process" style="margin: 0 10px;"></span>';
+                div += '</div>';
+                $container.append(div);
+            }
+            showNotice('正在进行版本推送');
+            ajaxRequest('/release/pushStart', {versionId: versionId}, function () {
+                for (var i = 0; i < servers.length; i++) {
+                    pushToServer(servers[i]['id']);
+                }
+            });
+        }
+
+        function pushToServer(serverId) {
+            var $server = $('#push-server-' + serverId);
+            $server.find('.process').text('推送中').css({color: 'skyblue'});
+            $server.find('.retry').remove();
+            var params = {versionId: versionId, serverId: serverId};
+            ajaxRequest('/release/pushToServer', params, function () {
+                pushed++;
+                $server.find('.process').text('SUCCESS').css({color: 'green'});
+                if (pushed === servers.length) {
+                    showNotice('版本推送完毕');
+                    ajaxRequest('/release/pushOver', {versionId: versionId}, function () {
+                        $('#btn-next').removeClass('hide');
+                        pushOver = true;
+                        step2();
+                    });
+                }
+            }, function (code, message) {
+                showNotice('版本推送发生错误');
+                $server.find('.process').text(message).css({color: 'red'});
+                var $btn = $('<a href="javascript:;" class="retry">Retry</a>');
+                $btn.appendTo($server).click(function () {
+                    pushToServer(serverId);
+                });
+            });
+        }
+
+        function publish() {
+            var div;
+            var $container = $('#publish-detail');
+            published = 0;
+            for (var i = 0; i < servers.length; i++) {
+                div = '<div id="publish-server-' + servers[i]['id'] + '" style="padding: 5px 0;">';
+                div += '<span>' + servers[i]['host'] + '</span>';
+                div += '<span class="process" style="margin: 0 10px;"></span>';
+                div += '</div>';
+                $container.append(div);
+            }
+            showNotice('正在进行版本发布');
+            ajaxRequest('/release/publishStart', {versionId: versionId}, function () {
+                for (var i = 0; i < servers.length; i++) {
+                    publishToServer(servers[i]['id']);
+                }
+            });
+        }
+
+        function publishToServer(serverId) {
+            var $server = $('#publish-server-' + serverId);
+            $server.find('.process').text('发布中').css({color: 'skyblue'});
+            $server.find('.retry').remove();
+            var params = {versionId: versionId, serverId: serverId};
+            ajaxRequest('/release/publishToServer', params, function () {
+                published++;
+                $server.find('.process').text('SUCCESS').css({color: 'green'});
+                if (published === servers.length) {
+                    showNotice('版本发布完毕');
+                    ajaxRequest('/release/publishOver', {versionId: versionId}, function () {
+                        $('#btn-complete').removeClass('hide');
+                    });
+                }
+            }, function (code, message) {
+                showNotice('版本发布发生错误');
+                $server.find('.process').text(message).css({color: 'red'});
+                var $btn = $('<a href="javascript:;" class="retry">Retry</a>');
+                $btn.appendTo($server).click(function () {
+                    publishToServer(serverId);
+                });
+            });
+        }
+
+        function showNotice(text) {
+            $('#release-notice').text(text);
+        }
+    })();
+</script>

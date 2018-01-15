@@ -1,0 +1,48 @@
+<div id="fileTreeBox" style="width: 600px;"></div>
+<script>
+    (function () {
+        var files = JSON.parse('{{json_encode($files)}}');
+
+        var level = 0;
+
+        function makeFileTree(files, root) {
+            level++;
+            root = root || '/';
+            var leafs = [];
+            var tree = '<ul class="fileTree ' + (level > 1 ? 'hide' : '') + '">';
+            if (files && Object.keys(files).length) {
+                for (var path in files) {
+                    if (typeof files[path] != 'string') {
+                        tree += '<li class="folder">';
+                        tree += '<a class="btn btn-link"><span class="icon"></span><span>' + path + '</span></a>';
+                        tree += makeFileTree(files[path], root + path + '/');
+                        tree += '</li>';
+                    } else {
+                        leafs.push(files[path]);
+                    }
+                }
+                for (var i = 0; i < leafs.length; i++) {
+                    tree += '<li class="file" data-path="' + root + '">';
+                    tree += '<span class="icon"></span><span class="filename">' + leafs[i] + '</span>';
+                    tree += '</li>';
+                }
+            } else {
+                tree += '<span style="color: grey;">&lt;empty&gt;</span>';
+            }
+            tree += '</ul>';
+            return tree;
+        }
+
+        $('#fileTreeBox').html(makeFileTree(files));
+
+        $('.fileTree').find('.folder').find('.btn').click(function () {
+            $(this).parent().find('>.fileTree').toggle();
+        });
+        $('.fileTree').find('.filename').click(function () {
+            var filename = $(this).text();
+            var root = $(this).parents('.file').attr('data-path');
+            var file = root.substr(1) + filename;
+            showDialog('文件预览', null, {url: '/package/fileView?uuid={{$REQUEST.uuid}}&file=' + file});
+        });
+    })();
+</script>

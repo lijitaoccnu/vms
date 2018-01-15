@@ -1,0 +1,12 @@
+<ul class="header-nav">
+    <li class="dropdown">
+        <img src="{{$IMG_URL}}/user.png"><span>{{$session.realname}}</span>
+        <ul class="dropdown-menu">
+            <li><a href="/account/info">我的资料</a></li>
+            <li><a href="/account/password">修改密码</a></li>
+        </ul>
+    </li>
+    <li onclick="logout()">
+        <img src="{{$IMG_URL}}/on-off.png"><span>退出</span>
+    </li>
+</ul>

@@ -1,0 +1,52 @@
+<div class="tool-box">
+    <a class="btn btn-primary btn-large" data-toggle="dialog" data-target="/server/edit?projId={{$REQUEST.projId}}">添加服务器</a>
+    <div class="search-box" style="padding: 5px 0;">
+        <form method="get">
+            <select name="projId" data-value="{{$REQUEST.projId}}" style="width: auto;">
+                <option value="" disabled selected class="hide">--项目--</option>
+                {{foreach item=project from=$projects}}
+                <option value="{{$project.id}}">{{$project.name}}</option>
+                {{/foreach}}
+            </select>
+            <a class="btn btn-primary" type="submit">搜 索</a>
+            <a class="btn btn-clear">清 空</a>
+        </form>
+    </div>
+</div>
+<div class="panel">
+    <div class="panel-head">服务器列表</div>
+    <div class="panel-body">
+        {{if $servers}}
+        <table data-delete-url="/server/delete?model=server&projId={{$REQUEST.projId}}">
+            <thead>
+            <tr>
+                <th width="200">地址</th>
+                <th width="200">状态</th>
+                <th width="200">操作</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {{foreach item=server from=$servers}}
+            <tr data-id="{{$server.id}}">
+                <td>{{$server.host}}</td>
+                <td>良好</td>
+                <td>
+                    <div class="btn-group">
+                        <a class="btn" data-toggle="dialog" data-target="/server/edit?id={{$server.id}}" data-title="编辑服务器">编 辑</a>
+                        <a class="btn btn-delete">删 除</a>
+                    </div>
+                </td>
+                <td></td>
+            </tr>
+            {{/foreach}}
+            </tbody>
+        </table>
+        {{$pager->display()}}
+        {{else}}
+        <div style="padding: 50px; text-align: center;">
+            <p>{{if $REQUEST.projId}}没有搜索到服务器{{else}}选择项目进行搜索{{/if}}</p>
+        </div>
+        {{/if}}
+    </div>
+</div>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>版本发布系统</title>
+    <link rel="stylesheet" href="{{$CSS_URL}}/admin.css">
+    <script type="text/javascript" src="{{$JS_URL}}/jquery.1.7.2.min.js"></script>
+    <script type="text/javascript">
+        var JS_URL = '{{$JS_URL}}';
+        var CSS_URL = '{{$CSS_URL}}';
+        var IMG_URL = '{{$IMG_URL}}';
+        var BASE_URL = '{{$BASE_URL}}';
+        var CURRENT_URI = '';
+    </script>
+</head>
+<body>
+<!--header-->
+<div id="header">
+    {{include file="./head.html"}}
+</div>
+<!--nav-->
+<div id="nav" class="nav">
+    {{include file="./nav.html"}}
+</div>
+<!--body-->
+<div id="body"></div>
+<!--footer-->
+<div id="footer"></div>
+<script type="text/javascript" src="{{$JS_URL}}/common.js"></script>
+<script type="text/javascript" src="{{$JS_URL}}/main.js"></script>
+</body>
+</html>

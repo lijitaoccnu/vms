@@ -1,0 +1,20 @@
+<form action="/server/{{if !$server}}create{{else}}update?id={{$server.id}}{{/if}}" method="post">
+    <div class="form-control">
+        <label>项目</label>
+        <select name="projId" data-value="{{$server.projId|default:$REQUEST.projId}}" required>
+            <option value="" disabled selected class="hide">--请选择--</option>
+            {{foreach item=project from=$projects}}
+            <option value="{{$project.id}}">{{$project.name}}</option>
+            {{/foreach}}
+        </select>
+    </div>
+    <div class="form-control">
+        <label>地址</label><input name="host" value="{{$server.host}}" placeholder="服务器IP" required>
+    </div>
+    <div class="form-control">
+        <label>用户</label><input name="user" value="{{$server.user}}" placeholder="服务器授权用户" required>
+    </div>
+    <div class="form-control">
+        <label>密码</label><input name="pwd" value="{{$server.pwd}}" placeholder="服务器授权密码" required>
+    </div>
+</form>
