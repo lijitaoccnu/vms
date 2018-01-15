@@ -6,10 +6,10 @@
 use FF\Framework\Common\Env;
 
 $config = array(
-    'publish.dev.com' => Env::DEVELOPMENT,
-    'publish.test.xxx.com' => Env::TESTING,
-    'publish.pre.xxx.com' => Env::PREVIEW,
-    'publish.xxx.com' => Env::PRODUCTION
+    'vms.dev.com' => Env::DEVELOPMENT,
+    'vms.test.xxx.com' => Env::TESTING,
+    'vms.pre.xxx.com' => Env::PREVIEW,
+    'vms.xxx.com' => Env::PRODUCTION
 );
 
 return $config;
